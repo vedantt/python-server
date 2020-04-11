@@ -178,4 +178,4 @@ api.add_resource(retrieveCallbackJobInstanceId,'/callback-service/jobInstanceId/
 api.add_resource(retrieveCallbackExecutionId,'/callback-service/executionId/<string:value>')
 api.add_resource(heathCheck,'/health-check')
 
-app.run(host='10.65.227.54',port=5002, debug=True)
+app.run(port=5000, debug=True)
