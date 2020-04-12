@@ -5,87 +5,46 @@ from datetime import datetime
 
 callbacks = []
 
+
+def save_callback(payload):
+    global callbacks
+    jobInstance=""
+    executionId=""
+    try:
+        jobInstance = payload["jobInstanceId"]
+    except KeyError : pass
+    try:
+        executionId = payload["executionId"]
+    except KeyError : pass
+    callback =  {
+    'method': request.method,
+    'data': request.get_json(),
+    'headers': dict(request.headers),
+    'url': request.url,
+    'time': datetime.now().isoformat(),
+    'jobInstanceId':jobInstance,
+    'executionId':executionId }
+    callbacks.append(callback)
+    return
+
 class callback(Resource):
     def put(self):
         payload = request.get_json()
-        jobInstance=""
-        executionId=""
-        try:
-            jobInstance = payload["jobInstanceId"]
-        except KeyError : pass
-        try:
-            executionId = payload["executionId"]
-        except KeyError : pass
-        callback =  {
-        'method': request.method,
-        'data': request.get_json(),
-        'headers': dict(request.headers),
-        'url': request.url,
-        'time': datetime.now().isoformat(),
-        'jobInstanceId':jobInstance,
-        'executionId':executionId }
-        callbacks.append(callback)
-        return '', 201
+        save_callback(payload)
+        return '', 202
     def post(self):
         payload = request.get_json()
-        jobInstance=""
-        executionId=""
-        try:
-            jobInstance = payload["jobInstanceId"]
-        except KeyError : pass
-        try:
-            executionId = payload["executionId"]
-        except KeyError : pass
-        callback = {
-        'method': request.method,
-        'data': request.get_json(),
-        'headers': dict(request.headers),
-        'url': request.url,
-        'time': datetime.now().isoformat(),
-        'jobInstanceId':jobInstance,
-        'executionId':executionId}
-        callbacks.append(callback)
-        return '', 201
+        save_callback(payload)
+        return '', 202
     def delete(self):
         payload = request.get_json()
-        jobInstance=""
-        executionId=""
-        try:
-            jobInstance = payload["jobInstanceId"]
-        except KeyError : pass
-        try:
-            executionId = payload["executionId"]
-        except KeyError : pass
-        callback = {
-        'method': request.method,
-        'data': request.get_json(),
-        'headers': dict(request.headers),
-        'url': request.url,
-        'time': datetime.now().isoformat(),
-        'jobInstanceId':jobInstance,
-        'executionId':executionId}
-        callbacks.append(callback)
-        return '', 201
+        save_callback(payload)
+        return '', 202
     def patch(self):
         payload = request.get_json()
-        jobInstance=""
-        executionId=""
-        try:
-            jobInstance = payload["jobInstanceId"]
-        except KeyError : pass
-        try:
-            executionId = payload["executionId"]
-        except KeyError : pass
-        callback = {
-        'method': request.method,
-        'data': request.get_json(),
-        'headers': dict(request.headers),
-        'url': request.url,
-        'time': datetime.now().isoformat(),
-        'jobInstanceId':jobInstance,
-        'executionId':executionId}
-        callbacks.append(callback)
-        return '', 201
+        save_callback(payload)
+        return '', 202
+
 class retrieveCallbacks(Resource):
     @jwt_required()
     def get(self,id=None):
