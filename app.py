@@ -24,4 +24,4 @@ api.add_resource(heathCheck,'/health-check')
 api.add_resource(UserRegister,'/register')
 
 if __name__ == '__main__':
-    app.run(host='10.65.227.54',port=5000, debug=True)
+    app.run(port=5000, debug=True)
