@@ -23,7 +23,7 @@ class callback(Resource):
         'headers': dict(request.headers),
         'url': request.url,
         'time': datetime.now().isoformat(),
-        'jobInstanceid':jobInstance,
+        'jobInstanceId':jobInstance,
         'executionId':executionId }
         callbacks.append(callback)
         return '', 201
