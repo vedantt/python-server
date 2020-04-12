@@ -1,8 +1,7 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 from flask_jwt import jwt_required
 from flask import request
 from datetime import datetime
-import sqlite3
 
 callbacks = []
 
