@@ -2,12 +2,15 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt import JWT ,current_identity
 from security import authenticate,identity
+from datetime import timedelta
 from user import UserRegister
 from callback import callback,retrieveCallbacks,retrieveCallbackJobInstanceId,retrieveCallbackExecutionId,heathCheck
 
 app = Flask(__name__)
 api= Api(app)
 app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['JWT_AUTH_URL_RULE'] = '/login'
+app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
 app.secret_key = 'vedant'
 jwt = JWT(app, authenticate, identity)
 

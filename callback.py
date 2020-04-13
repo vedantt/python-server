@@ -5,7 +5,6 @@ from datetime import datetime
 
 callbacks = []
 
-
 def save_callback(payload):
     global callbacks
     jobInstance=""
