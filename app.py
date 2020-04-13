@@ -3,8 +3,8 @@ from flask_restful import Api
 from flask_jwt import JWT ,current_identity
 from security import authenticate,identity
 from datetime import timedelta
-from user import UserRegister
-from callback import callback,retrieveCallbacks,retrieveCallbackJobInstanceId,retrieveCallbackExecutionId,heathCheck
+from resources.user import UserRegister
+from resources.callback import callback,retrieveCallbacks,retrieveCallbackJobInstanceId,retrieveCallbackExecutionId,heathCheck
 
 app = Flask(__name__)
 api= Api(app)
