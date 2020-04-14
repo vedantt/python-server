@@ -34,14 +34,6 @@ class callbackModel(db.Model):
     @classmethod
     def find_by_key(cls, keys):
         return cls.query.filter_by(keys=keys).all()
-    @classmethod
-    def delete_all_db(cls):
-        try:
-            cls.query(callbackModel).delete()
-            db.session.commit()
-        except: pass
-        return
-
 
     @classmethod
     def find_all(cls):

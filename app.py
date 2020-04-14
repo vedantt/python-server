@@ -23,7 +23,6 @@ def create_tables():
 
 
 
-
 api.add_resource(callback,'/callback')
 api.add_resource(retrieveCallbacks,'/callback-service/')
 api.add_resource(retrieveCallbackJobInstanceId,'/callback-service/jobInstanceId/<string:value>')
@@ -31,7 +30,7 @@ api.add_resource(retrieveCallbackExecutionId,'/callback-service/executionId/<str
 api.add_resource(retrieveCallbackExecutionIdLast,'/callback-service/executionId/<string:value>/last')
 api.add_resource(heathCheck,'/health-check')
 api.add_resource(UserRegister,'/register')
-    db.init_app(app)
+db.init_app(app)
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
