@@ -23,7 +23,7 @@ class callbackModel(db.Model):
         self.state = state
     def json(self):
         return {
-            'methoda': self.method,
+            'method': self.method,
             'data': self.data,
             'header': self.header,
             'url': self.url,
