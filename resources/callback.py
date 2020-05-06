@@ -56,8 +56,6 @@ class retrieveCallbacks(Resource):
             [item.delete_from_db() for item in items]
         return {"message":"deleted"},200
 
-
-
 class retrieveCallbackJobInstanceId(Resource):
 
     @jwt_required()
@@ -74,14 +72,15 @@ class retrieveCallbackJobInstanceId(Resource):
             return {'message': 'Item deleted.'}
         return {'message': 'Item not found.'}, 404
 
-
 class retrieveCallbackExecutionId(Resource):
 
     @jwt_required()
     def get(self,value=None):
         items = [item.json() for item in callbackModel.find_by_key(value)]
+        if(len(items)==0):
+            return {'message': 'Item not found'}, 404
         return {"TotalNumberOfCallbacks":len(items),"items":items},200
-        return {'message': 'Item not found'}, 404
+
 
     @jwt_required()
     def delete(self,value=None):
@@ -103,8 +102,6 @@ class retrieveCallbackExecutionIdLast(Resource):
             if not itemsLast or itemsLast is  None:
                 return {"message":"job is still running"} , 404
         return itemsLast[0],200
-
-
 
 class heathCheck(Resource):
     def get(self):
