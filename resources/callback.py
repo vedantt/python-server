@@ -5,13 +5,17 @@ from datetime import datetime
 import json
 from models.callbacks import callbackModel
 
-
+flag=0;
+id=1;
 
 def save_callback(payload):
+    global flag
+    global id
     try:
         jobInstance = payload["jobInstanceId"]
         item = callbackModel(jobInstance,request.method,json.loads(request.data.decode('utf-8')),dict(request.headers),request.url,datetime.now().isoformat(),True)
         item.save_to_db()
+        flag=1
     except KeyError : pass
     try:
         execution = payload["executionId"]
@@ -21,9 +25,15 @@ def save_callback(payload):
             item = callbackModel(execution,request.method,json.loads(request.data.decode('utf-8')),dict(request.headers),request.url,datetime.now().isoformat(),False)
         try:
             item.save_to_db()
+            flag=1
         except:
             return {"message": "An error occurred inserting the item."}, 500
     except KeyError : pass
+    if flag==0:
+        item = callbackModel(id,request.method,json.loads(request.data.decode('utf-8')),dict(request.headers),request.url,datetime.now().isoformat(),True)
+        item.save_to_db()
+        id=id+1;
+    flag=0
     return
 
 class callback(Resource):
@@ -56,13 +66,19 @@ class retrieveCallbacks(Resource):
             [item.delete_from_db() for item in items]
         return {"message":"deleted"},200
 
+
+
 class retrieveCallbackJobInstanceId(Resource):
 
     @jwt_required()
     def get(self,value=None):
         items = [item.json() for item in callbackModel.find_by_key(value)]
+        if(len(items) == 0):
+            return {'message': 'Item not found'}, 404
         return {"TotalNumberOfCallbacks":len(items),"items":items},200
-        return {'message': 'Item not found'}, 404
+
+
+
 
     @jwt_required()
     def delete(self,value=None):
@@ -72,15 +88,14 @@ class retrieveCallbackJobInstanceId(Resource):
             return {'message': 'Item deleted.'}
         return {'message': 'Item not found.'}, 404
 
+
 class retrieveCallbackExecutionId(Resource):
 
     @jwt_required()
     def get(self,value=None):
         items = [item.json() for item in callbackModel.find_by_key(value)]
-        if(len(items)==0):
-            return {'message': 'Item not found'}, 404
         return {"TotalNumberOfCallbacks":len(items),"items":items},200
-
+        return {'message': 'Item not found'}, 404
 
     @jwt_required()
     def delete(self,value=None):
@@ -102,6 +117,8 @@ class retrieveCallbackExecutionIdLast(Resource):
             if not itemsLast or itemsLast is  None:
                 return {"message":"job is still running"} , 404
         return itemsLast[0],200
+
+
 
 class heathCheck(Resource):
     def get(self):
