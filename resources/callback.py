@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import json
 from models.callbacks import callbackModel
 
-
 flag = 0
 id = 1
 
@@ -79,7 +78,7 @@ def updated_callback(item):
                                                              payload["PRICE"],
                                                              payload["BATCH NUMBER"], payload["BOX NO"],
                                                              datetime.now().date(), "ACTIVE", quantity, category,
-                                                             payload['UPDATED_NAME'])
+                                                             payload['UPDATED_NAME'], payload["BOX NO UPDATED"])
                 flag = 0
             else:
                 value = callbackModel.find_and_update_record(payload["NAME"], payload["FEATURE"], payload["LOCATION"],
@@ -87,7 +86,7 @@ def updated_callback(item):
                                                              payload["BATCH NUMBER"], payload["BOX NO"],
                                                              datetime.now().date(), payload["STATE"], quantity,
                                                              category,
-                                                             payload['UPDATED_NAME'])
+                                                             payload['UPDATED_NAME'], payload["BOX NO UPDATED"])
 
         except Exception as ex:
             return {"message": str(ex)[:50]}, 500
@@ -117,7 +116,7 @@ def resurvive_record(payload):
                                                              datetime.now().date(), payload["STATE"], quantity)
     except Exception as ex:
         return {"message": str(ex)[:50]}, 500
-    return str(value), 200
+    return {"message": str(value)}, 200
 
 
 def update_operation(item):
@@ -151,15 +150,15 @@ class callback(Resource):
 
 class retrieveCallbacks(Resource):
     def get(self, id=None):
-        items, largest = callbackModel.find_all()
-        return {"TotalNumberOfCallbacks": len(items), "items": [','.join(items)], "itemBoxDetails": largest}, 200
+        items, largest, stock, category = callbackModel.find_all()
+        return {"TotalNumberOfCallbacks": len(items), "items": [','.join(items)], "itemBoxDetails": largest,
+                "itemStock": stock, "itemsWithCategory": [','.join(category)]}, 200
 
     def post(self):
         items = [item.json() for item in callbackModel.find_all_changes_done_today()]
         if len(items) == 0:
             return {"TotalNumberOfCallbacks": len(items), "items": items}, 200
         return {"TotalNumberOfCallbacks": len(items), "items": items}, 200
-
 
 
 class retrieveCallbackJobInstanceId(Resource):
@@ -179,10 +178,23 @@ class retrieveCallbackJobInstanceId(Resource):
                         required=False,
                         help="This field cannot be blank."
                         )
+    parser.add_argument('LOCATION',
+                        type=str,
+                        required=False,
+                        help="This field cannot be blank."
+                        )
 
-    def get(self, value=None):
+    def post(self, value=None):
         data = retrieveCallbackJobInstanceId.parser.parse_args()
         items = [item.json() for item in callbackModel.find_by_key(value, data["STATE"])]
+        if len(items) == 0:
+            return {"TotalNumberOfCallbacks": len(items), "items": items}, 200
+
+        return {"TotalNumberOfCallbacks": len(items), "items": items}, 200
+
+    def put(self, value=None):
+        data = retrieveCallbackJobInstanceId.parser.parse_args()
+        items = [item.json() for item in callbackModel.find_by_only_key_and_update_godown(value, data['LOCATION'])]
         if len(items) == 0:
             return {"TotalNumberOfCallbacks": len(items), "items": items}, 200
 
@@ -218,6 +230,15 @@ class permamentSkudelete(Resource):
         items = callbackModel.find_by_only_key(value)
         if len(items):
             items_to_returned = [item.json() for item in callbackModel.find_by_only_key(value)]
+            [item.delete_from_db() for item in items]
+            return {'message': 'Item deleted.', "deletedItems": items_to_returned, "totalCount": len(items_to_returned)}
+        return {'message': 'Item not found.'}, 404
+
+    def put(self, value=None):
+        payload = request.get_json()
+        items = callbackModel.find_by_key_and_id(value, payload['BOX NO'])
+        if len(items):
+            items_to_returned = [item.json() for item in callbackModel.find_by_key_and_id(value, payload['BOX NO'])]
             [item.delete_from_db() for item in items]
             return {'message': 'Item deleted.', "deletedItems": items_to_returned, "totalCount": len(items_to_returned)}
         return {'message': 'Item not found.'}, 404
@@ -268,4 +289,4 @@ class reportItem(Resource):
     def put(self, id=None):
         payload = request.get_json()
         items = callbackModel.find_and_update_name(payload['NAME'], payload['UPDATED_NAME'])
-        return {'message': 'Item updated.',"totalCount": len(items)}
+        return {'message': 'Item updated.', "totalCount": len(items)}
